@@ -4,13 +4,17 @@ export class DniNamePart {
     private readonly namePart: string;
     constructor( value: string, propName: string ){
         const v: string = value.trim();
-        if(!value || (value.length < 2 || value.length > 30)){
+        if(!v || (v.length < 2 || v.length > 30)){
             throw new DomainRuleViolationError(`DniNamePart - ${propName} must be between 2 and 30 characters long.`);
         }
         this.namePart = v;
     }
 
     public value(): string{
+        return this.namePart
+    }
+    // Just for debugging purposes
+    public toString(): string{
         return this.namePart
     }
 
