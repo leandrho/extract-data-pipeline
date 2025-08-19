@@ -1,11 +1,11 @@
-import { DomainRuleViolationError } from "../errors/DomainRuleViolationError";
+import { InvalidPropertyError } from "../../../shared/domain/errors/InvalidPropertyError";
 
 export class DniNamePart {
     private readonly namePart: string;
     constructor( value: string, propName: string ){
         const v: string = value.trim();
         if(!v || (v.length < 2 || v.length > 30)){
-            throw new DomainRuleViolationError(`DniNamePart - ${propName} must be between 2 and 30 characters long.`);
+            throw new InvalidPropertyError(`DniNamePart - ${propName} must be between 2 and 30 characters long.`, propName, this.value);
         }
         this.namePart = v;
     }

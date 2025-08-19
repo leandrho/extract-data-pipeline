@@ -1,3 +1,4 @@
+import { InvalidPropertyError } from "src/lib/shared/domain/errors/InvalidPropertyError";
 
 export class DniBirthDate {
     private readonly birthDate: Date;
@@ -5,7 +6,7 @@ export class DniBirthDate {
     constructor(birthDate: Date){
         const now = new Date();
         if(!(birthDate instanceof Date) || isNaN(birthDate.getTime()) || (now.getTime() < birthDate.getTime())){
-            throw new Error('DniBirthDate - Invalid date.');
+            throw new InvalidPropertyError('DniBirthDate - Invalid date.', 'DniBirthDate', this.value);
         }
         this.birthDate = birthDate;
     }
