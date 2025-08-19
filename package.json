@@ -1,16 +1,17 @@
 {
   "name": "extract-data-pipeline",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "dev": "tsnd --respawn --clear src/app.ts",
-    "build": "rimraf dist && tsc",
-    "start": "npm run build && node dist/app.js"
+  "main": "app.js",
+ "scripts": {
+    "start": "node dist/app.js",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "description": "",
   "devDependencies": {
     "@types/express": "^5.0.3",
@@ -20,6 +21,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^17.2.1",
+    "env-var": "^7.5.0",
+    "express": "^5.1.0",
+    "winston": "^3.17.0"
   }
 }
