@@ -1,4 +1,4 @@
-import { OcrService } from 'src/lib/shared/application/services/OcrService';
+import { IOcrService } from 'src/lib/shared/application/services/IOcrService';
 import { DataExtractService } from '../../domain/services/DataExtractService';
 import { DocumentDniOutDto } from '../dtos/DocumentDniOutDto';
 import { ILogger } from 'src/lib/shared/application/services/ILogger';
@@ -8,12 +8,13 @@ export class ProcessDocumentDniUseCase {
 
     constructor(
         private readonly dataExtractor: DataExtractService,
-        private readonly ocrService: OcrService,
+        private readonly ocrService: IOcrService,
         private readonly logger: ILogger
     ){}
 
     async execute(imgPath: string): Promise<DocumentDniOutDto | null> {
 
+        this.logger.info('ProcessDocumentDniUseCase::execute - Starting DNI document processing', { imgPath });
         const text = await this.ocrService.extractTextFromImage(imgPath);
         
         const documentDni = await this.dataExtractor.extractDniDataFromDniOcr(text);
