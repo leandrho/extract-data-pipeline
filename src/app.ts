@@ -1,14 +1,17 @@
 import express, {Application} from "express";
 import { json } from 'body-parser';
 import { createErrorHandlerMiddleware } from './lib/shared/infrastructure/http/middlewares/errorHandlerMiddleware';
-import { WinstonLogger } from './lib/shared/infrastructure/logger/WinstonLogger';
+import { WinstonLogger } from './lib/shared/infrastructure/services/WinstonLogger';
 import { ILogger } from "./lib/shared/application/services/ILogger";
 import envs from "./lib/config/envs";
 import { PipeRouter } from './lib/pipeline/infrastructure/http/PipeRouter';
 import { PipeController } from "./lib/pipeline/infrastructure/http/PipeController";
 import { ProcessDocumentDniUseCase } from "./lib/pipeline/application/use-cases/ProcessDocumentDniUseCase";
 import { DataExtractService } from './lib/pipeline/domain/services/DataExtractService';
-import { OcrService } from "./lib/shared/application/services/OcrService";
+import { IOcrService } from "./lib/shared/application/services/IOcrService";
+import { IFileUpload } from "./lib/shared/application/interfaces/IFileUpload";
+import { FileUploadMulter } from "./lib/shared/infrastructure/middleware/FileUploadMulter";
+import { OcrTesseractService } from "./lib/shared/infrastructure/services/OcrTesseractService";
 
 const app: Application = express();
 
@@ -17,10 +20,11 @@ const errorHandlerMiddleware = createErrorHandlerMiddleware(logger);
 
 app.use(json());
 const dataExtractServiceInstance: any = null;;
-const ocrService: any = null ;
+const ocrService: OcrTesseractService = new OcrTesseractService(logger); ;
 const processDniUC: ProcessDocumentDniUseCase = new ProcessDocumentDniUseCase(dataExtractServiceInstance, ocrService, logger);
+const fileUpload: IFileUpload = new FileUploadMulter('tmp/',logger); // Replace with actual file upload service
 const pipeController: PipeController = new PipeController(processDniUC, logger);
-const pipeRouter: PipeRouter = new PipeRouter(pipeController);
+const pipeRouter: PipeRouter = new PipeRouter(fileUpload, pipeController);
 app.use('/process-dni', pipeRouter.router);
 app.use(errorHandlerMiddleware)
 
