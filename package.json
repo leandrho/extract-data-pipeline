@@ -2,7 +2,7 @@
   "name": "extract-data-pipeline",
   "version": "1.0.0",
   "main": "app.js",
- "scripts": {
+  "scripts": {
     "start": "node dist/app.js",
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
@@ -15,7 +15,9 @@
   "description": "",
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.2.1",
+    "@types/tesseract.js": "^2.0.0",
     "rimraf": "^6.0.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
@@ -24,6 +26,8 @@
     "dotenv": "^17.2.1",
     "env-var": "^7.5.0",
     "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "tesseract.js": "^6.0.1",
     "winston": "^3.17.0"
   }
 }
