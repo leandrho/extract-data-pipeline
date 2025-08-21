@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { InvalidPropertyError, TemporaryFileAccessError, DomainRuleViolationError } from '../../../../shared/domain/errors';
-import { ILogger } from 'src/lib/shared/application/services/ILogger';
+import { ILogger } from '../../../../shared/application/services/ILogger';
 
 
 export const createErrorHandlerMiddleware = (logger: ILogger) => { 
