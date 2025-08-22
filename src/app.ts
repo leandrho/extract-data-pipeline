@@ -12,6 +12,7 @@ import { IOcrService } from "./lib/shared/application/services/IOcrService";
 import { IFileUpload } from "./lib/shared/application/interfaces/IFileUpload";
 import { FileUploadMulter } from "./lib/shared/infrastructure/middleware/FileUploadMulter";
 import { OcrTesseractService } from "./lib/shared/infrastructure/services/OcrTesseractService";
+import { IaOpenAIDataExtractService } from "./lib/pipeline/infrastructure/services/IaOpenAIDataExtractService";
 
 const app: Application = express();
 
@@ -19,8 +20,8 @@ const logger: ILogger = new WinstonLogger();
 const errorHandlerMiddleware = createErrorHandlerMiddleware(logger);
 
 app.use(json());
-const dataExtractServiceInstance: any = null;;
-const ocrService: OcrTesseractService = new OcrTesseractService(logger); ;
+const dataExtractServiceInstance: DataExtractService = new IaOpenAIDataExtractService(logger);;
+const ocrService: IOcrService = new OcrTesseractService(logger); ;
 const processDniUC: ProcessDocumentDniUseCase = new ProcessDocumentDniUseCase(dataExtractServiceInstance, ocrService, logger);
 const fileUpload: IFileUpload = new FileUploadMulter('tmp/',logger); // Replace with actual file upload service
 const pipeController: PipeController = new PipeController(processDniUC, logger);
