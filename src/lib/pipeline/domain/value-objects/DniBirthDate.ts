@@ -1,4 +1,4 @@
-import { InvalidPropertyError } from "src/lib/shared/domain/errors/InvalidPropertyError";
+import { InvalidPropertyError } from "../../../shared/domain/errors/InvalidPropertyError";
 
 export class DniBirthDate {
     private readonly birthDate: Date;
