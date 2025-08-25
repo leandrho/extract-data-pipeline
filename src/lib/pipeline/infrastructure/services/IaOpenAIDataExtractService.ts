@@ -15,26 +15,26 @@ export class IaOpenAIDataExtractService implements DataExtractService {
 
     public async extractDniDataFromDniOcr(text: string): Promise<DocumentDni | null> {
             const prompt = `
-Extract the DNI number, first name, last name, and birth date from the following text.
+                            Clean(remove all special characters) and extract the DNI number, first name, last name, and birth date from the following text.
 
-⚠️ Output rules:
-- Return only valid JSON.
-- Do not include explanations or any extra text.
-- Wrap the result inside a Markdown JSON block.
-- Number ID(Document) includes dots, remove them. its length is between 8 and 9 digits, and can't start with 0.
+                            ⚠️ Output rules:
+                            - Return only valid JSON.
+                            - Do not include explanations or any extra text.
+                            - Wrap the result inside a Markdown JSON block.
+                            - Number ID(Document) includes dots, remove them. its length is between 8 and 9 digits, and can't start with 0.
 
-The output must follow this structure:
-\`\`\`json
-{
-"numberId": "DNI number",
-"firstName": "First name",
-"lastName": "Last name",
-"birthDate": "YYYY-MM-DD"
-}
-\`\`\`
+                            The output must follow this structure:
+                            \`\`\`json
+                            {
+                            "numberId": "DNI number",
+                            "firstName": "First name",
+                            "lastName": "Last name",
+                            "birthDate": "YYYY-MM-DD"
+                            }
+                            \`\`\`
 
-Text to extract from:
-${text}`;
+                            Text to extract from:
+                            ${text}`;
 
             const res = await this.openai.responses.create({
                 model: 'openai/gpt-oss-20b',
