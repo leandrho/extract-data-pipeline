@@ -23,7 +23,7 @@ app.use(json());
 const dataExtractServiceInstance: DataExtractService = new IaOpenAIDataExtractService(logger);;
 const ocrService: IOcrService = new OcrTesseractService(logger); ;
 const processDniUC: ProcessDocumentDniUseCase = new ProcessDocumentDniUseCase(dataExtractServiceInstance, ocrService, logger);
-const fileUpload: IFileUpload = new FileUploadMulter('tmp/',logger); // Replace with actual file upload service
+const fileUpload: IFileUpload = new FileUploadMulter('tmp/',logger);
 const pipeController: PipeController = new PipeController(processDniUC, logger);
 const pipeRouter: PipeRouter = new PipeRouter(fileUpload, pipeController);
 app.use('/process-dni', pipeRouter.router);
