@@ -1,19 +1,22 @@
 import { ILogger } from "../../../shared/application/services/ILogger";
 import { DataExtractService } from "../../domain/services/DataExtractService";
 import { DocumentDni } from "../../domain/entities/DocumentDni";
+import envs from "../../../config/envs";
 import OpenAI from "openai";
 
 export class IaOpenAIDataExtractService implements DataExtractService {
     private openai: OpenAI;
     constructor(private readonly logger: ILogger){
         this.openai = new OpenAI({
-            apiKey: 'your-ai-api-key',
-            baseURL: 'http://127.0.0.1:1234/v1',
+            apiKey: envs.OPENAI_API_KEY,
+            baseURL: envs.OPENAI_BASE_URL || 'http://127.0.0.1:1234/v1',
         });
-        this.logger.info('IaOpenAIDataExtractService initialized with Ollama model', { model: 'openai/gpt-oss-20b' });
+        this.logger.info('IaOpenAIDataExtractService initialized', { model: 'openai/gpt-oss-20b', baseURL: this.openai.baseURL });
     }
 
     public async extractDniDataFromDniOcr(text: string): Promise<DocumentDni | null> {
+
+        try {
             const prompt = `
                             Clean(remove all special characters) and extract the DNI number, first name, last name, and birth date from the following text.
 
@@ -43,23 +46,36 @@ export class IaOpenAIDataExtractService implements DataExtractService {
                 
             });
 
-            const match = res.output_text.match(/\{[\s\S]*\}/);
-            let obj: {numberId: string, firstName: string, lastName: string, birthDate: string} = {numberId: '', firstName: '', lastName: '', birthDate: ''};
-            if (match) {
-                obj = JSON.parse(match[0]);
+            // Regex to find a JSON object inside markdown code fences
+            const jsonRegex = /```json\s*([\s\S]*?)\s*```/;
+            const match = res.output_text.match(jsonRegex);
+
+            if (!match || !match[1]) {
+                this.logger.warn('IaOpenAIDataExtractService::extractDniDataFromDniOcr - No JSON block found in AI response', { response: res.output_text });
+                return null;
             }
 
-            const output = {
-                numberId: obj.numberId,
-                firstName: obj.firstName,
-                lastName: obj.lastName,
-                birthDate: obj.birthDate
-            };
-            this.logger.info('IaOpenAIDataExtractService::extractDniDataFromDniOcr - Data extracted from OpenAI', { output });
-            if(!output.numberId || !output.firstName)
+            const jsonObj = JSON.parse(match[1]);
+
+            // Basic validation of the parsed object
+            if (typeof jsonObj.numberId !== 'string' || typeof jsonObj.firstName !== 'string' || typeof jsonObj.lastName !== 'string' || typeof jsonObj.birthDate !== 'string') {
+                this.logger.warn('IaOpenAIDataExtractService::extractDniDataFromDniOcr - Parsed JSON has incorrect structure', { jsonObj });
                 return null;
+            }
+
+            const output = jsonObj as {numberId: string, firstName: string, lastName: string, birthDate: string};
+
+            this.logger.info('IaOpenAIDataExtractService::extractDniDataFromDniOcr - Data extracted from OpenAI', { output });
+            if(!output.numberId || !output.firstName) {
+                this.logger.warn('IaOpenAIDataExtractService::extractDniDataFromDniOcr - Extracted data is missing required fields', { output });
+                return null;
+            }
 
             return DocumentDni.fromPrimitives({numberId: output.numberId, firstName: output.firstName, lastName: output.lastName, birthDate: new Date(output.birthDate)});
+        } catch (error) {
+            this.logger.error('IaOpenAIDataExtractService::extractDniDataFromDniOcr - Failed to extract or process DNI data', error as Error, { text });
+            return null;
+        }
     }
 
 }
