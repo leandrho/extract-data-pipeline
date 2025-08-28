@@ -6,7 +6,7 @@ export class DniBirthDate {
     constructor(birthDate: Date){
         const now = new Date();
         if(!(birthDate instanceof Date) || isNaN(birthDate.getTime()) || (now.getTime() < birthDate.getTime())){
-            throw new InvalidPropertyError('DniBirthDate - Invalid date.', 'DniBirthDate', this.value);
+            throw new InvalidPropertyError('DniBirthDate - Invalid date.', 'DniBirthDate', birthDate);
         }
         this.birthDate = birthDate;
     }

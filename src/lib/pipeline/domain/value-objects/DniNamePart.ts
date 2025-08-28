@@ -5,7 +5,7 @@ export class DniNamePart {
     constructor( value: string, propName: string ){
         const v: string = value.trim();
         if(!v || (v.length < 2 || v.length > 30)){
-            throw new InvalidPropertyError(`DniNamePart - ${propName} must be between 2 and 30 characters long.`, propName, this.value);
+            throw new InvalidPropertyError(`DniNamePart - ${propName} must be between 2 and 30 characters long.`, propName, value);
         }
         this.namePart = v;
     }

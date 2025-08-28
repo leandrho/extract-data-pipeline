@@ -5,7 +5,7 @@ export class DniNumber{
     constructor(num: string){
         const v: string = num.trim();
         if(!v || (v.length !== 8 && v.length !== 9) || !isFinite(Number(v))){
-            throw new InvalidPropertyError('DniNumber - dni must be 8 or 9 digits long..', 'DniNumber', this.value);
+            throw new InvalidPropertyError('DniNumber - dni must be 8 or 9 digits long.', 'DniNumber', num);
         }
         this.dni = v;
     }
