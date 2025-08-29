@@ -1,11 +1,13 @@
-import Tesseract,{WorkerOptions} from 'tesseract.js';
+import Tesseract from 'tesseract.js';
 import { IOcrService } from "../../application/services/IOcrService";
 import { ILogger } from '../../application/services/ILogger';
+import { inject, injectable } from 'inversify';
+import { SHARED_TYPES } from "../../types";
 
-
+@injectable()
 export class OcrTesseractService implements IOcrService {
 
-    constructor(private readonly logger: ILogger, private readonly lng: string = 'spa') {}
+    constructor(@inject(SHARED_TYPES.Logger) private readonly logger: ILogger, private readonly lng: string = 'spa') {}
 
     async extractTextFromImage(imgPath: string): Promise<string> {
        const { data: { text } } = await Tesseract.recognize(

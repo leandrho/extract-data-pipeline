@@ -3,12 +3,26 @@ import { ILogger } from "../../application/services/ILogger";
 import  multer, {Multer}  from 'multer';
 import { RequestHandler } from "express";
 import path from 'path';
+import { InvalidPropertyError } from "../../domain/errors";
+import { inject, injectable } from "inversify";
+import { SHARED_TYPES } from "../../types";
+
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+
+@injectable()
 export class FileUploadMulter implements IFileUpload {
 
     private readonly mul: Multer;
     
-    constructor( destiny: string, private readonly logger: ILogger ){
+    constructor( @inject(SHARED_TYPES.Logger) private readonly logger: ILogger, destiny: string = 'tmp/'){
         this.mul = multer({
+           fileFilter: (req, file, cb) => {
+                if (allowedMimeTypes.includes(file.mimetype)) {
+                    cb(null, true);
+                } else {
+                    cb(new InvalidPropertyError(`Invalid file type: ${file.mimetype}. Only ${allowedMimeTypes.join(', ')} are allowed.`, 'file', file.mimetype));
+                }
+            },
            storage: multer.diskStorage({
                     // a. Dónde se guardarán los archivos
                     destination: function (req, file, cb) {

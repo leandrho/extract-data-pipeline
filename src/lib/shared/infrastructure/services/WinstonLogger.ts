@@ -3,7 +3,9 @@ import winston from 'winston'
 
 import { ILogger } from '../../application/services/ILogger';
 import envs from '../../../config/envs';
+import { injectable } from 'inversify';
 
+@injectable()
 export class WinstonLogger implements ILogger {
 
     private logger: winston.Logger;
