@@ -10,7 +10,7 @@ const envs = {
     NODE_ENV: env.get('NODE_ENV').default('development').asString(),
     PORT: env.get('PORT').default(3000).asPortNumber(),
     OPENAI_API_KEY: env.get('OPENAI_API_KEY').required().asString(),
-    OPENAI_BASE_URL: env.get('OPENAI_BASE_URL').asString(),
+    OPENAI_BASE_URL: env.get('OPENAI_BASE_URL').default('http://127.0.0.1:1234/v1').asString(),
 }
 
 export default envs;
