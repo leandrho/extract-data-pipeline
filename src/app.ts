@@ -1,31 +1,27 @@
+import "reflect-metadata";
 import express, {Application} from "express";
 import { json } from 'body-parser';
 import { createErrorHandlerMiddleware } from './lib/shared/infrastructure/http/middlewares/errorHandlerMiddleware';
-import { WinstonLogger } from './lib/shared/infrastructure/services/WinstonLogger';
 import { ILogger } from "./lib/shared/application/services/ILogger";
 import envs from "./lib/config/envs";
 import { PipeRouter } from './lib/pipeline/infrastructure/http/PipeRouter';
-import { PipeController } from "./lib/pipeline/infrastructure/http/PipeController";
-import { ProcessDocumentDniUseCase } from "./lib/pipeline/application/use-cases/ProcessDocumentDniUseCase";
-import { DataExtractService } from './lib/pipeline/domain/services/DataExtractService';
-import { IOcrService } from "./lib/shared/application/services/IOcrService";
-import { IFileUpload } from "./lib/shared/application/interfaces/IFileUpload";
-import { FileUploadMulter } from "./lib/shared/infrastructure/middleware/FileUploadMulter";
-import { OcrTesseractService } from "./lib/shared/infrastructure/services/OcrTesseractService";
-import { IaOpenAIDataExtractService } from "./lib/pipeline/infrastructure/services/IaOpenAIDataExtractService";
+import { Container } from "inversify";
+import { configurePipelineModule } from "./lib/pipeline/config/inversify.config";
+import { configureSharedModule } from "./lib/shared/config/inversify.config";
+import { SHARED_TYPES } from "./lib/shared/types";
+import { PIPE_TYPES } from "./lib/pipeline/types";
 
 const app: Application = express();
+const container = new Container();
+configureSharedModule(container);
+configurePipelineModule(container);
 
-const logger: ILogger = new WinstonLogger();
+const logger: ILogger = container.get<ILogger>(SHARED_TYPES.Logger);
 const errorHandlerMiddleware = createErrorHandlerMiddleware(logger);
 
+const pipeRouter = container.get<PipeRouter>(PIPE_TYPES.PipeRouter);
+
 app.use(json());
-const dataExtractServiceInstance: DataExtractService = new IaOpenAIDataExtractService(logger);;
-const ocrService: IOcrService = new OcrTesseractService(logger); ;
-const processDniUC: ProcessDocumentDniUseCase = new ProcessDocumentDniUseCase(dataExtractServiceInstance, ocrService, logger);
-const fileUpload: IFileUpload = new FileUploadMulter('tmp/',logger);
-const pipeController: PipeController = new PipeController(processDniUC, logger);
-const pipeRouter: PipeRouter = new PipeRouter(fileUpload, pipeController);
 app.use('/process-dni', pipeRouter.router);
 app.use(errorHandlerMiddleware)
 
