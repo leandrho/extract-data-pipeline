@@ -1,15 +1,18 @@
-import { IOcrService } from 'src/lib/shared/application/services/IOcrService';
+import { IOcrService } from '../../../shared/application/services/IOcrService';
 import { DataExtractService } from '../../domain/services/DataExtractService';
 import { DocumentDniOutDto } from '../dtos/DocumentDniOutDto';
-import { ILogger } from 'src/lib/shared/application/services/ILogger';
+import { ILogger } from '../../../shared/application/services/ILogger';
+import { inject, injectable } from 'inversify';
+import { PIPE_TYPES } from '../../types';
+import { SHARED_TYPES } from "../../../shared/types"
 
-
+@injectable()
 export class ProcessDocumentDniUseCase {
 
     constructor(
-        private readonly dataExtractor: DataExtractService,
-        private readonly ocrService: IOcrService,
-        private readonly logger: ILogger
+        @inject(PIPE_TYPES.DataExtractService) private readonly dataExtractor: DataExtractService,
+        @inject(SHARED_TYPES.OcrService) private readonly ocrService: IOcrService,
+        @inject(SHARED_TYPES.Logger) private readonly logger: ILogger
     ){}
 
     async execute(imgPath: string): Promise<DocumentDniOutDto | null> {
