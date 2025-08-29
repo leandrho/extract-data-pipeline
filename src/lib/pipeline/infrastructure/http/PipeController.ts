@@ -1,10 +1,14 @@
 import { Request, Response } from 'express';
 import { ProcessDocumentDniUseCase } from '../../application/use-cases/ProcessDocumentDniUseCase';
 import { ILogger } from '../../../shared/application/services/ILogger';
+import { inject, injectable } from 'inversify';
+import { PIPE_TYPES } from '../../types';
+import { SHARED_TYPES } from '../../../shared/types';
 
+@injectable()
 export class PipeController {
 
-    constructor( private readonly processDocumentDniUC: ProcessDocumentDniUseCase, private readonly logger: ILogger ){}
+    constructor( @inject(PIPE_TYPES.ProcessDocumentDniUseCase) private readonly processDocumentDniUC: ProcessDocumentDniUseCase, @inject(SHARED_TYPES.Logger) private readonly logger: ILogger ){}
 
     public async processDNI(req: Request, res: Response): Promise<void>{
 

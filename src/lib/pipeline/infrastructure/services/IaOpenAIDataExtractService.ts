@@ -3,15 +3,18 @@ import { DataExtractService } from "../../domain/services/DataExtractService";
 import { DocumentDni } from "../../domain/entities/DocumentDni";
 import envs from "../../../config/envs";
 import OpenAI from "openai";
+import { inject, injectable } from "inversify";
+import { SHARED_TYPES } from "../../../shared/types";
 
+@injectable()
 export class IaOpenAIDataExtractService implements DataExtractService {
     private openai: OpenAI;
-    constructor(private readonly logger: ILogger){
+    constructor(@inject(SHARED_TYPES.Logger) private readonly logger: ILogger){
         this.openai = new OpenAI({
             apiKey: envs.OPENAI_API_KEY,
-            baseURL: envs.OPENAI_BASE_URL || 'http://127.0.0.1:1234/v1',
+            baseURL: envs.OPENAI_BASE_URL,
         });
-        this.logger.info('IaOpenAIDataExtractService initialized', { model: 'openai/gpt-oss-20b', baseURL: this.openai.baseURL });
+        this.logger.info('IaOpenAIDataExtractService initialized', { model: 'gemma-3-4b-it', baseURL: this.openai.baseURL });
     }
 
     public async extractDniDataFromDniOcr(text: string): Promise<DocumentDni | null> {
@@ -40,7 +43,7 @@ export class IaOpenAIDataExtractService implements DataExtractService {
                             ${text}`;
 
             const res = await this.openai.responses.create({
-                model: 'openai/gpt-oss-20b',
+                model: 'gemma-3-4b-it',
                 instructions: 'You are a helpful assistant that extracts DNI data from text.' ,
                 input: prompt
                 
